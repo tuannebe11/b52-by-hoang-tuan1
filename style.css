@@ -1,0 +1,48 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 0;
+  background: #70c5ce;
+}
+
+#gameCanvas {
+  background: #fff;
+  display: block;
+  margin: 20px auto;
+  border: 2px solid #333;
+}
+
+#menu, #telegramJoin, #gameOverScreen {
+  margin-top: 20px;
+}
+
+#gameOverScreen {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#score {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+#progressContainer {
+  width: 400px;
+  height: 10px;
+  background: #ccc;
+  margin: 10px auto;
+}
+
+#progressBar {
+  height: 10px;
+  background: green;
+  width: 0%;
+}
