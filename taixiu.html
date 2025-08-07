@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Game Tài Xỉu SunWin</title>
+<style>
+  body { margin: 0; font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(45deg,#1a1a2e,#0f3460); color:#fff; text-align:center;}
+  #join-telegram {padding:40px;}
+  .btn-telegram {padding:12px 24px; font-size:18px; color:#000;
+    background:#00ffd0; border-radius:8px; text-decoration:none; font-weight:bold;}
+  .container {max-width:500px; margin:20px auto; background:#16213e; border-radius:12px;
+    box-shadow:0 0 20px rgba(0,0,0,0.5); padding:20px;}
+  .balance {font-size:20px; color:#0f0; font-weight:bold;}
+  .bet-section {display:flex; justify-content:center; gap:10px; margin:20px 0;}
+  .bet-section input {padding:10px; font-size:16px; width:120px; border-radius:6px; border:none; text-align:center;}
+  .bet-buttons button {flex:1; padding:12px; font-size:16px; border:none; border-radius:6px; cursor:pointer;}
+  .btn-tai {background:#4caf50; color:#fff;}
+  .btn-xiu {background:#f44336; color:#fff;}
+  #countdown {font-size:22px; color:#ffeb3b; margin-top:10px;}
+  #dice-container {display:flex; justify-content:center; gap:15px; font-size:48px; margin:20px 0;}
+  .shake {animation:shake 0.3s infinite;}
+  @keyframes shake {0%{transform:rotate(0deg);}25%{transform:rotate(10deg);}50%{transform:rotate(0deg);}
+    75%{transform:rotate(-10deg);}100%{transform:rotate(0deg);}}
+  #result {font-size:20px; margin:10px 0;}
+  #history {margin-top:20px; text-align:left;}
+  #history ul {list-style:none; padding:0; max-height:200px; overflow-y:auto;}
+  #history li {background:#0f3460; padding:8px 6px; margin-bottom:4px; border-radius:6px;}
+</style>
+</head>
+<body>
+
+<h1>🎲 Tài Xỉu SunWin</h1>
+
+<div id="join-telegram">
+  <p>🔒 Bạn cần tham gia nhóm Telegram để chơi:</p>
+  <a href="https://t.me/htuanpremium1" target="_blank" class="btn-telegram" onclick="unlockGame()">Tham gia ngay</a>
+  <p id="checking" style="display:none; margin-top:10px;">⏳ Đang kiểm tra...</p>
+</div>
+
+<div id="game-container" style="display:none;">
+  <div class="container">
+    <div class="balance">Số dư: <span id="balance">10000</span> đ</div>
+    <div class="bet-section">
+      <button class="btn-tai" onclick="placeBet('tai')">Cược Tài</button>
+      <button class="btn-xiu" onclick="placeBet('xiu')">Cược Xỉu</button>
+      <input type="number" id="betAmount" placeholder=">=100" min="100"/>
+    </div>
+    <div id="countdown">Đang chờ cược...</div>
+    <div id="dice-container">
+      <div id="dice1">🎲</div>
+      <div id="dice2">🎲</div>
+      <div id="dice3">🎲</div>
+    </div>
+    <div id="result">Kết quả sẽ hiện sau mở bát...</div>
+    <div id="history"><h3>Lịch sử ván:</h3><ul id="historyList"></ul></div>
+  </div>
+</div>
+
+<script>
+  let balance=10000, currentBet=null, currentChoice='', isRolling=false;
+  const hist= document.getElementById('historyList');
+
+  function unlockGame(){
+    document.getElementById('checking').style.display='block';
+    setTimeout(()=>{
+      document.getElementById('join-telegram').style.display='none';
+      document.getElementById('game-container').style.display='block';
+      document.getElementById('checking').style.display='none';
+      alert('✅ Đã xác nhận tham gia nhóm! Bắt đầu chơi nào.');
+    },3000);
+  }
+
+  function placeBet(choice){
+    if(isRolling) return;
+    const amt=parseInt(document.getElementById('betAmount').value);
+    if(isNaN(amt)||amt<100||amt>balance){ return alert('Số tiền cược không hợp lệ'); }
+    balance-=amt; currentBet=amt; currentChoice=choice;
+    document.getElementById('balance').innerText=balance;
+    document.getElementById('countdown').innerText='⏳ Đang lắc bát...';
+    rollDice();
+  }
+
+  function rollDice(){
+    isRolling=true;
+    const diceEls=[...document.querySelectorAll('#dice-container > div')];
+    diceEls.forEach(d=>d.classList.add('shake'));
+    setTimeout(()=>{
+      diceEls.forEach(d=>d.classList.remove('shake'));
+      const d=[randDice(),randDice(),randDice()];
+      const total=d.reduce((a,b)=>a+b,0);
+      d.forEach((v,i)=>diceEls[i].innerText=getDiceFace(v));
+      const outcome = total>=11?'tai':'xiu';
+      let res=`🎯 Tổng: ${total} → ${outcome.toUpperCase()}`;
+      if(currentChoice===outcome){
+        const win=currentBet*2; balance+=win;
+        res+=` ✅ Bạn thắng +${win} đ`; 
+      } else res+=` ❌ Thua -${currentBet} đ`;
+      document.getElementById('balance').innerText=balance;
+      document.getElementById('result').innerText=res;
+      logHistory(total,outcome);
+      resetGame();
+    },3000);
+  }
+
+  function logHistory(total,outcome){
+    const li=document.createElement('li');
+    li.innerText=`${new Date().toLocaleTimeString()} – Tổng:${total} – ${outcome.toUpperCase()}`;
+    hist.prepend(li);
+    if(hist.children.length>10) hist.removeChild(hist.lastChild);
+  }
+  function resetGame(){currentBet=null;currentChoice='';isRolling=false;
+    document.getElementById('countdown').innerText='Đang chờ cược...';}
+  function randDice(){return Math.floor(Math.random()*6)+1;}
+  function getDiceFace(v){return ['⚀','⚁','⚂','⚃','⚄','⚅'][v-1];}
+</script>
+
+</body>
+</html>
