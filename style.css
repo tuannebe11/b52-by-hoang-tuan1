@@ -1,0 +1,23 @@
+body {
+  text-align: center;
+  background-color: #70c5ce;
+  margin: 0;
+  font-family: sans-serif;
+}
+
+#gameCanvas {
+  display: none;
+  background: url('assets/background.png') no-repeat center center;
+  background-size: cover;
+  margin-top: 20px;
+}
+
+#telegramJoin, #menu, #gameOverScreen {
+  margin-top: 50px;
+}
+
+#reloadBtn {
+  font-size: 18px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
